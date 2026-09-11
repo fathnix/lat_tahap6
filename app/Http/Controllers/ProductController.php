@@ -42,7 +42,7 @@ class ProductController extends Controller
         try{
             $product = $this->productService->createProduct($request->validated());
             return response()->json([
-                'status' => 'failed',
+                'status' => 'success',
                 'message' => 'Data berhasil di simpan',
                 'data' => $product
             ], 201);

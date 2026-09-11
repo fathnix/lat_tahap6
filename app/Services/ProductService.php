@@ -1,5 +1,7 @@
 <?php
 namespace App\Services;
+
+use App\Jobs\StrukBarang;
 use App\Repositories\Interfaces\ProductRepository;
 
 
@@ -20,6 +22,7 @@ class ProductService{
     }
 
     public function createProduct(array $data){
+        StrukBarang::dispatch($data);
         return $this->productRepo->create($data);
     }
 
