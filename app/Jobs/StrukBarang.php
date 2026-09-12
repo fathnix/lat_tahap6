@@ -2,38 +2,63 @@
 
 namespace App\Jobs;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
+use Log;
+use Throwable;
 
 class StrukBarang implements ShouldQueue
 {
-    use Queueable;
-    protected $dataTitipan;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $productData;
 
     /**
-     * Create a new job instance.
+     * Menerima array data product dari ProductService
      */
-    public function __construct()
+    public function __construct(array $productData)
     {
-        //
+        $this->productData = $productData;
     }
 
     /**
-     * Execute the job.
+     * Eksekusi job untuk membuat file txt
      */
     public function handle(): void
     {
-        sleep(3);
+        // 1. Ambil data dari property array yang dikirim
+        $id = $this->productData['id'];
+        $nama = $this->productData['name'];
+        $jumlah = $this->productData['jumlah'];
+        $kategoriId = $this->productData['categori_id'];
+        
+        $namaFile = 'struk_produk_' . $id . '.txt';
+        
+        // 2. Format isi file struk
+        $isiStruk  = "=== BUKTI PENAMBAHAN PRODUK ===\n";
+        $isiStruk .= "ID Produk   : " . $id . "\n";
+        $isiStruk .= "Nama Produk : " . $nama . "\n";
+        $isiStruk .= "Jumlah      : " . $jumlah . "\n";
+        $isiStruk .= "ID Kategori : " . $kategoriId . "\n";
+        $isiStruk .= "Waktu       : " . now()->format('Y-m-d H:i:s') . "\n";
+        $isiStruk .= "===============================\n";
+        $isiStruk .= "Data berhasil disimpan di sistem.";
 
-        // 2. Logika membuat file teks (struk)
-        $namaFile = 'struk_' . $this->dataTitipan['id'] . '.txt';
-        $isiStruk = "=== BUKTI PENITIPAN MASJID ===\n";
-        $isiStruk .= "ID Titipan: " . $this->dataTitipan['id'] . "\n";
-        $isiStruk .= "Barang: " . $this->dataTitipan['nama_barang'] . "\n";
-        $isiStruk .= "Pemilik: " . $this->dataTitipan['nama_pemilik'] . "\n";
-        $isiStruk .= "Terima kasih!";
-
-        // Simpan file ke folder storage/app/
-        // Storage::put($namaFile, $isiStruk);
+        // 3. Simpan file ke folder storage/app/public/
+        Storage::disk('public')->put($namaFile, $isiStruk);
     }
+
+    /**
+     * (Opsional) Jika Job Gagal, akan masuk ke fungsi ini.
+     * Sangat berguna untuk debugging jika queue fail.
+     */
+    // public function failed(Throwable $exception): void
+    // {
+    //     // Catat error di file storage/logs/laravel.log
+    //     Log::error('Job StrukBarang Gagal untuk Product ID ' . ($this->productData['id'] ?? 'Unknown') . ': ' . $exception->getMessage());
+    // }
 }
