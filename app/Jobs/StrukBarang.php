@@ -7,8 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Log;
 use Throwable;
 
 class StrukBarang implements ShouldQueue
@@ -56,9 +56,9 @@ class StrukBarang implements ShouldQueue
      * (Opsional) Jika Job Gagal, akan masuk ke fungsi ini.
      * Sangat berguna untuk debugging jika queue fail.
      */
-    // public function failed(Throwable $exception): void
-    // {
-    //     // Catat error di file storage/logs/laravel.log
-    //     Log::error('Job StrukBarang Gagal untuk Product ID ' . ($this->productData['id'] ?? 'Unknown') . ': ' . $exception->getMessage());
-    // }
+    public function failed(Throwable $exception): void
+    {
+        // Catat error di file storage/logs/laravel.log
+        Log::error('Job StrukBarang Gagal untuk Product ID ' . ($this->productData['id'] ?? 'Unknown') . ': ' . $exception->getMessage());
+    }
 }
